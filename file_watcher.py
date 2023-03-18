@@ -12,7 +12,7 @@ import openpyxl as xl;
 watchDirectory = r"C:\Users\juanc\OneDrive\Documents\Projects\programming_excersise\files"
 processedPath = r'C:\Users\juanc\OneDrive\Documents\Projects\programming_excersise\files\Processed'
 notApplicablePath= r'C:\Users\juanc\OneDrive\Documents\Projects\programming_excersise\files\Not Applicable'
-filename1 =r"C:\Users\juanc\OneDrive\Documents\Projects\programming_excersise\master.xlsx"
+master_file =r"C:\Users\juanc\OneDrive\Documents\Projects\programming_excersise\master.xlsx"
 
 #The interval at which we are going to review if any file was added. 
 pollTime = 2 
@@ -52,7 +52,7 @@ def new_file_actions(newFiles: list, previousFileList: list) -> list:
 def file_watcher(my_dir: str, pollTime: int):
     workbook = xl.Workbook()
     worksheet=workbook.active
-    workbook.save(str(filename1))
+    workbook.save(str(master_file))
     
     while True:
         if 'watching' not in locals(): #Check if this is the first time the function has run
@@ -72,31 +72,30 @@ def file_watcher(my_dir: str, pollTime: int):
 def consolidate_master(path_new_file: str):
     # opening the source excel file
     filename = path_new_file
-    wb1 = xl.load_workbook(filename)
-    for x in wb1.worksheets:
-        ws1 = x
+    wb_newfile = xl.load_workbook(filename)
+    for sheet in wb_newfile.worksheets:
+        wb_newsheet = sheet
         # Opening the destination excel file
-        wb2 = xl.load_workbook(filename1)
-        wb2.create_sheet(x.title)
-        ws2 = wb2[x.title]
+        wb_master = xl.load_workbook(master_file)
+        wb_master.create_sheet(sheet.title)
+        ws_master = wb_master[sheet.title]
 
         # calculate total number of rows and
         # columns in source excel file
-        mr = ws1.max_row
-        mc = ws1.max_column
+        mr = wb_newsheet.max_row
+        mc = wb_newsheet.max_column
 
         # copying the cell values from source
         # excel file to destination excel file
         for i in range (1, mr + 1):
             for j in range (1, mc + 1):
                 # reading cell value from source excel file
-                c = ws1.cell(row = i, column = j)
-
+                c = wb_newsheet.cell(row = i, column = j)
                 # writing the read value to destination excel file
-                ws2.cell(row = i, column = j).value = c.value
+                ws_master.cell(row = i, column = j).value = c.value
 
         # saving the destination excel file
-        wb2.save(str(filename1))
+        ws_master.save(str(master_file))
 
 """
     Returns the extension of the file that was sent.
